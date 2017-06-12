@@ -263,6 +263,10 @@ def run_create(name, token, systems, org, private):
         content=description,
     )
 
+    # create the master branch
+    ref = repo.get_git_ref("heads/master")
+    repo.create_git_ref(ref="refs/heads/master", sha=ref.object.sha)
+
     # add all the template files to the master branch
     for template in tqdm(TEMPLATES, desc="Adding template files"):
         with open(os.path.join(ROOT, "template", template), "r") as f:
@@ -274,7 +278,7 @@ def run_create(name, token, systems, org, private):
             )
 
     # set the master branch to be the default branch
-    repo.edit(name=name, default_branch="master")
+    # repo.edit(name=name, default_branch="master")
 
     # run an initial update to add content to the index
     run_update(token=token, name=name, org=org)
@@ -294,6 +298,8 @@ def run_create(name, token, systems, org, private):
     click.echo("\nIn order to update this status page, run the following command:")
     click.echo("statuspage update --name={name} --token={token} {org}".format(
             name=name, token=token, org="--org=" + entity.login if org else ""))
+
+
 
 def iter_systems(labels):
     for label in labels:
