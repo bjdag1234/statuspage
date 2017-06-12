@@ -265,7 +265,7 @@ def run_create(name, token, systems, org, private):
 
     # create the master branch
     ref = repo.get_git_ref("heads/master")
-    repo.create_git_ref(ref="refs/heads/master", sha=ref.object.sha)
+    #repo.create_git_ref(ref="refs/heads/master", sha=ref.object.sha)
 
     # add all the template files to the master branch
     for template in tqdm(TEMPLATES, desc="Adding template files"):
