@@ -15,7 +15,7 @@ from collections import OrderedDict
 import markdown2
 import json
 
-__version__ = "0.9.1_lidar"
+__version__ = "0.9.2_lidar"
 
 try:
     ROOT = sys._MEIPASS
@@ -27,6 +27,8 @@ PY3 = sys.version_info >= (3, 0)
 COLORED_LABELS = (
     ("1192FC", "investigating",),
 	("00E8CC", "migrating"),
+	("04E00B", "preventive maintenance"),
+	("FC0C0C", "partial outage"),
     ("FFA500", "degraded performance"),
     ("FF4D4D", "major outage", )
 )
