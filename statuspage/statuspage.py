@@ -15,7 +15,7 @@ from collections import OrderedDict
 import markdown2
 import json
 
-__version__ = "0.9.0"
+__version__ = "0.9.1_lidar"
 
 try:
     ROOT = sys._MEIPASS
@@ -26,6 +26,7 @@ PY3 = sys.version_info >= (3, 0)
 
 COLORED_LABELS = (
     ("1192FC", "investigating",),
+	("00E8CC", "migrating"),
     ("FFA500", "degraded performance"),
     ("FF4D4D", "major outage", )
 )
@@ -44,7 +45,7 @@ TEMPLATES = [
 DEFAULT_CONFIG = {
     "footer": "Status page hosted by GitHub, generated with <a href='https://github.com/jayfk/statuspage'>jayfk/statuspage</a>",
     "logo": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/logo.png",
-    "title": "Status",
+    "title": "PHIL-LiDAR 1 Network Status",
     "favicon": "https://raw.githubusercontent.com/jayfk/statuspage/master/template/favicon.png"
 }
 
@@ -139,9 +140,9 @@ def run_upgrade(name, token, org):
 
     repo = get_repo(token=token, name=name, org=org)
     files = get_files(repo=repo)
-    head_sha = repo.get_git_ref("heads/gh-pages").object.sha
+    head_sha = repo.get_git_ref("heads/master").object.sha
 
-    # add all the template files to the gh-pages branch
+    # add all the template files to the master branch
     for template in tqdm(TEMPLATES, desc="Updating template files"):
         with open(os.path.join(ROOT, "template", template), "r") as f:
             content = f.read()
@@ -159,14 +160,14 @@ def run_upgrade(name, token, org):
                         sha=repo_template.sha,
                         message="upgrade",
                         content=content,
-                        branch="gh-pages"
+                        branch="master"
                     )
             else:
                 repo.create_file(
                     path="/" + template,
                     message="upgrade",
                     content=content,
-                    branch="gh-pages"
+                    branch="master"
                 )
 
 
@@ -176,7 +177,7 @@ def run_update(name, token, org):
     issues = get_issues(repo)
 
     # get the SHA of the current HEAD
-    sha = repo.get_git_ref("heads/gh-pages").object.sha
+    sha = repo.get_git_ref("heads/master").object.sha
 
     # get the template from the repo
     template_file = repo.get_file_contents(
@@ -212,7 +213,7 @@ def run_update(name, token, org):
             sha=index.sha,
             message="update index",
             content=content,
-            branch="gh-pages"
+            branch="master"
         )
     except UnknownObjectException:
         # index.html does not exist, create it
@@ -220,7 +221,7 @@ def run_update(name, token, org):
             path="/index.html",
             message="initial",
             content=content,
-            branch="gh-pages",
+            branch="master",
         )
 
 
@@ -252,7 +253,7 @@ def run_create(name, token, systems, org, private):
     for label in tqdm(systems.split(","), desc="Creating system labels"):
         repo.create_label(name=label.strip(), color=SYSTEM_LABEL_COLOR)
 
-    # add an empty file to master, otherwise we won't be able to create the gh-pages
+    # add an empty file to master, otherwise we won't be able to create the master
     # branch
     repo.create_file(
         path="/README.md",
@@ -260,22 +261,22 @@ def run_create(name, token, systems, org, private):
         content=description,
     )
 
-    # create the gh-pages branch
+    # create the master branch
     ref = repo.get_git_ref("heads/master")
-    repo.create_git_ref(ref="refs/heads/gh-pages", sha=ref.object.sha)
+    repo.create_git_ref(ref="refs/heads/master", sha=ref.object.sha)
 
-    # add all the template files to the gh-pages branch
+    # add all the template files to the master branch
     for template in tqdm(TEMPLATES, desc="Adding template files"):
         with open(os.path.join(ROOT, "template", template), "r") as f:
             repo.create_file(
                 path="/" + template,
                 message="initial",
                 content=f.read(),
-                branch="gh-pages"
+                branch="master"
             )
 
-    # set the gh-pages branch to be the default branch
-    repo.edit(name=name, default_branch="gh-pages")
+    # set the master branch to be the default branch
+    repo.edit(name=name, default_branch="master")
 
     # run an initial update to add content to the index
     run_update(token=token, name=name, org=org)
@@ -308,7 +309,7 @@ def get_files(repo):
     """
     Get a list of all files.
     """
-    return [file.path for file in repo.get_dir_contents("/", ref="gh-pages")]
+    return [file.path for file in repo.get_dir_contents("/", ref="master")]
 
 
 def get_config(repo):
@@ -320,7 +321,7 @@ def get_config(repo):
     config = DEFAULT_CONFIG
     if "config.json" in files:
         # get the config file, parse JSON and merge it with the default config
-        config_file = repo.get_file_contents('/config.json', ref="gh-pages")
+        config_file = repo.get_file_contents('/config.json', ref="master")
         try:
             repo_config = json.loads(config_file.decoded_content.decode("utf-8"))
             config.update(repo_config)

@@ -31,7 +31,7 @@ setup(
     long_description=long_description,
     author='Jannis Gebauer',
     author_email='ja.geb@me.com',
-    url='https://github.com/jayfk/statuspage',
+    url='https://github.com/bjdag1234/statuspage',
     entry_points='''
         [console_scripts]
         statuspage=statuspage.statuspage:cli
