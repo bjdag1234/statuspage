@@ -1,4 +1,4 @@
-GITHUB_USER=jayfk
+GITHUB_USER=bjdag1234
 GITHUB_REPO=statuspage
 GITHUB_RELEASE := $(shell which github-release)
 all: osx linux
